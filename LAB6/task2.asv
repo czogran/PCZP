@@ -1,0 +1,49 @@
+close all
+clear all
+clc
+
+%% a
+% https://www.omega.co.uk/literature/transactions/volume3/strain.html
+dL=[0 0.02 0.04	0.06 0.08 0.1];
+L=230;
+strains = dL./L;
+micro_strains = strains * 1e6;
+
+%% b
+data = readmatrix('data2.txt');
+wave_length = data(:,1);
+power = data(:,2:length(data(1,:)));
+power_length = length(power(1,:));
+
+figure
+legend_text = "dL: " + string(dL);
+
+for k=1:power_length
+    plot(wave_length,power(:,k))
+    hold on
+end
+grid on
+title('rodzina charakterystyk spektralnych')
+xlabel('długość fali [nm]')
+ylabel('P[dBm]')
+legend(legend_text, 'Location', 'best')
+hold off
+
+%% c
+lambdas = zeros(1,power_length);
+for k=1:power_length
+    lambdas(k) = wave_length(find(power(:,k)== min(power(:,k)),1));
+end
+
+figure
+plot(micro_strains, lambdas)
+grid on
+xlabel('odkształcenie [mikrostrainy]')
+ylabel("długość fali Bragga[nm]")
+title("charakterystykę ilustrująca zmiany długości fali Bragga siatki "+newline+"w funkcji odkształcenia")
+hold off
+
+%% d
+dLambdas= max(lambdas) - min(lambdas);
+ke = (dLambdas/lambdas(1))/micro_strains(end)
+Ke=ke*lm
